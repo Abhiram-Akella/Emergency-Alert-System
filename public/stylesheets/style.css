@@ -6,3 +6,120 @@ body {
 a {
   color: #00B7FF;
 }
+
+/* Login form styles */
+.login-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.login-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  background-color: #00B7FF;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #0099cc;
+}
+
+.error-message {
+  color: #ff4444;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #ffebee;
+  border-radius: 3px;
+}
+
+/* Registration form styles */
+.registration-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.registration-container h1 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.registration-container .form-group {
+  margin-bottom: 20px;
+}
+
+.registration-container .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.registration-container .form-group input,
+.registration-container .form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.registration-container button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #00B7FF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+}
+
+.registration-container button[type="submit"]:hover {
+  background-color: #0099cc;
+}
+
+.registration-container p {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.registration-container a {
+  color: #00B7FF;
+  text-decoration: none;
+}
+
+.registration-container a:hover {
+  text-decoration: underline;
+}
