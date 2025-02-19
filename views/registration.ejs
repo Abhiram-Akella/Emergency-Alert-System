@@ -1,46 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register</title>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
-  </head>
-  <body>
-    <div class="registration-container">
-      <h1>Register</h1>
-      <% if (typeof error !== 'undefined' && error) { %>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body>
+  <div class="registration-container">
+    <h1>Register</h1>
+    <% if (typeof error !== 'undefined' && error) { %>
       <div class="error-message"><%= error %></div>
-      <% } %>
-      <form action="/auth/register" method="POST">
-        <div class="form-group">
-          <label for="name">Name:</label>
-          <input type="text" id="name" name="name" required />
-        </div>
-        <div class="form-group">
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" required />
-        </div>
-        <div class="form-group">
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required />
-        </div>
-        <div class="form-group">
-          <label for="phone">Phone:</label>
-          <input type="text" id="phone" name="phone" required />
-        </div>
-        <div class="form-group">
-          <label for="role">Role:</label>
-          <select id="role" name="role">
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-            <option value="responder">Responder</option>
-          </select>
-        </div>
-        <button type="submit">Register</button>
-      </form>
-        <p>Already have an account? <a href="/auth/login">Login here</a></p>
+    <% } %>
+    <form id="register-form" action="/auth/register" method="POST">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" required>
+      </div>
+      <input type="hidden" id="latitude" name="latitude">
+      <input type="hidden" id="longitude" name="longitude">
+      <div class="form-group">
+        <label for="role">Role:</label>
+        <select id="role" name="role">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+          <option value="responder">Responder</option>
+        </select>
+      </div>
+      <button type="submit" id="register-btn">Register</button>
+    </form>
+    <p>Already have an account? <a href="/auth/login">Login here</a></p>
+  </div>
 
-    </div>
-  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const latInput = document.getElementById("latitude");
+      const lngInput = document.getElementById("longitude");
+      const registerForm = document.getElementById("register-form");
+  
+      function getLocation(callback) {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              latInput.value = position.coords.latitude;
+              lngInput.value = position.coords.longitude;
+              console.log("Updated Location:", latInput.value, lngInput.value);
+              if (callback) callback(); // Proceed only after setting location
+            },
+            (error) => {
+              console.error("Error fetching location:", error.message);
+              alert("Please allow location access.");
+              if (callback) callback(); // Proceed even if error occurs
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          );
+        } else {
+          alert("Geolocation is not supported by this browser.");
+          if (callback) callback();
+        }
+      }
+  
+      registerForm.addEventListener("submit", function (event) {
+        if (!latInput.value || !lngInput.value) {
+          event.preventDefault(); // Stop form submission
+          console.log("Fetching location...");
+          getLocation(() => {
+            console.log("Submitting form with location:", latInput.value, lngInput.value);
+            registerForm.submit(); // Now submit after location is set
+          });
+        }
+      });
+  
+      getLocation();
+    });
+  </script>  
+</body>
 </html>

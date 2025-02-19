@@ -20,4 +20,11 @@ router.post('/register', register);
 //Login a user
 router.post('/login',login);
 
+// Log geolocation coordinates
+router.post('/log-coords', (req, res) => {
+  const { latitude, longitude } = req.body;
+  console.log('Received coordinates - Latitude:', latitude, 'Longitude:', longitude);
+  res.status(200).json({ message: 'Coordinates received' });
+});
+
 module.exports = router;
