@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/auth/logout">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="admin-controls">
+            <h2>System Management</h2>
+            <div class="controls-grid">
+                <div class="control-card">
+                    <h3>User Management</h3>
+                    <p>Manage all system users</p>
+                    <a href="/admin/users" class="btn">Manage Users</a>
+                </div>
+                <div class="control-card">
+                    <h3>Reports</h3>
+                    <p>View and manage emergency reports</p>
+                    <a href="/admin/reports" class="btn">View Reports</a>
+                </div>
+                <div class="control-card">
+                    <h3>System Settings</h3>
+                    <p>Configure system parameters</p>
+                    <a href="/admin/settings" class="btn">Settings</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Emergency Response System</p>
+    </footer>
+</body>
+</html>

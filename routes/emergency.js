@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage});
 
 // Get the emergency report page
-router.get("/", function (req, res) {
+router.get("/create", function (req, res) {
   res.render("report", { title: "Report Emergency" });
 });
 

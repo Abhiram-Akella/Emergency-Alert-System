@@ -69,7 +69,7 @@
                 const data = await response.json();
                 if (response.ok) {
                   alert("Emergency report submitted successfully!");
-                  // window.location.href = "/dashboard";
+                   window.location.href = "/users/user";
                 } else {
                   alert(data.error || "Error submitting report");
                 }

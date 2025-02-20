@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responder Dashboard</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body>
+    <header>
+        <h1>Responder Dashboard</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/auth/logout">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="responder-controls">
+            <h2>Emergency Management</h2>
+            <div class="controls-grid">
+                <div class="control-card">
+                    <h3>Active Incidents</h3>
+                    <p>View and manage active emergencies</p>
+                    <a href="/responder/incidents" class="btn">View Incidents</a>
+                </div>
+                <div class="control-card">
+                    <h3>My Assignments</h3>
+                    <p>View your assigned emergencies</p>
+                    <a href="/responder/assignments" class="btn">My Assignments</a>
+                </div>
+                <div class="control-card">
+                    <h3>Response Tools</h3>
+                    <p>Access emergency response tools</p>
+                    <a href="/responder/tools" class="btn">Response Tools</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Emergency Response System</p>
+    </footer>
+</body>
+</html>

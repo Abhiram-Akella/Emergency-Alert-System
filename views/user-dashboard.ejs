@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body>
+    <header>
+        <h1>User Dashboard</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/auth/logout">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="user-controls">
+            <h2>Emergency Services</h2>
+            <div class="controls-grid">
+                <div class="control-card">
+                    <h3>Report Emergency</h3>
+                    <p>Submit a new emergency report</p>
+                    <a href="/emergency/create" class="btn">Report Emergency</a>
+                </div>
+                <div class="control-card">
+                    <h3>My Reports</h3>
+                    <p>View your submitted reports</p>
+                    <a href="/user/reports" class="btn">My Reports</a>
+                </div>
+                <div class="control-card">
+                    <h3>Safety Resources</h3>
+                    <p>Access safety information and resources</p>
+                    <a href="/user/resources" class="btn">Safety Resources</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Emergency Response System</p>
+    </footer>
+</body>
+</html>

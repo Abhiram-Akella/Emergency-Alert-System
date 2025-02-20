@@ -1,16 +1,16 @@
 // Admin Controller
 const admin = async(req,res)=>{
-    res.json({message:"Welcome Admin!"});
+    res.render('admin-dashboard', { title: 'Admin Dashboard' });
 }
 
 // Responder Controller
 const responder = async(req,res)=>{
-    res.json({message:"Welcome Responder!"});
+    res.render('responder-dashboard', { title: 'Responder Dashboard' });
 }
 
 // User Controller
 const user = async(req,res)=>{
-    res.json({message:"Welcome User!"});
+    res.render('user-dashboard', { title: 'User Dashboard' });
 }
 
 module.exports = {admin,responder,user};

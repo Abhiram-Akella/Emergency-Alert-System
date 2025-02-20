@@ -52,7 +52,17 @@ const login = async (req, res) => {
       httpOnly: true,
       maxAge: 3600000, // 1 hour
     });
-    res.status(200).redirect('/emergency');
+    // Redirect based on user role
+    switch(user.role) {
+      case 'admin':
+        res.status(200).redirect('/users/admin');
+        break;
+      case 'responder':
+        res.status(200).redirect('/users/responder');
+        break;
+      default:
+        res.status(200).redirect('/users/user');
+    }
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
