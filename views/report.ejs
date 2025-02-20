@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emergency Report</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <div class="report-container">
+      <h1>Report an Emergency</h1>
+      <form id="report-form">
+        <div class="form-group">
+          <label for="type">Emergency Type:</label>
+          <select id="type" name="type" required>
+            <option value="Fire">Fire</option>
+            <option value="Crime">Crime</option>
+            <option value="Medical">Medical</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea id="description" name="description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="media">Upload Media (optional):</label>
+          <input type="file" id="media" name="media" />
+        </div>
+        <input type="hidden" id="latitude" name="latitude" />
+        <input type="hidden" id="longitude" name="longitude" />
+        <button type="submit">Submit Report</button>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("report-form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              async (position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                console.log(latitude, longitude);
+                const formData = new FormData();
+                formData.append("type", document.getElementById("type").value);
+                formData.append(
+                  "description",
+                  document.getElementById("description").value
+                );
+                formData.append("latitude", latitude);
+                formData.append("longitude", longitude);
+
+                const media = document.getElementById("media").files[0];
+                if (media) formData.append("media", media);
+
+                const response = await fetch("/emergency/create", {
+                  method: "POST",
+                  body: formData,
+                  credentials: "include",
+                  headers: {
+                    Accept: "application/json",
+                  },
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                  alert("Emergency report submitted successfully!");
+                  // window.location.href = "/dashboard";
+                } else {
+                  alert(data.error || "Error submitting report");
+                }
+              },
+              () => {
+                alert(
+                  "Location access denied. Enable location to report an emergency."
+                );
+              }
+            );
+          } else {
+            alert("Geolocation is not supported in this browser.");
+          }
+        });
+    </script>
+  </body>
+</html>

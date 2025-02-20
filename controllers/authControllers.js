@@ -50,11 +50,9 @@ const login = async (req, res) => {
     );
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
       maxAge: 3600000, // 1 hour
     });
-    res.status(200).json({ user });
+    res.status(200).redirect('/emergency');
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
