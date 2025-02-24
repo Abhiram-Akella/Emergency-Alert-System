@@ -1,45 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/stylesheets/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <style>
+      .status-pending {
+        background-color: #fff3cd;
+      }
+      .status-in-progress {
+        background-color: #d1ecf1;
+      }
+      .status-resolved {
+        background-color: #d4edda;
+      }
+      .responder-select {
+        margin-right: 10px;
+      }
+      .assign-btn {
+        padding: 2px 8px;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
     <header>
-        <h1>Admin Dashboard</h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/auth/logout">Logout</a>
-        </nav>
+      <h1>Admin Dashboard</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/auth/logout">Logout</a>
+      </nav>
     </header>
 
     <main>
-        <section class="admin-controls">
-            <h2>System Management</h2>
-            <div class="controls-grid">
-                <div class="control-card">
-                    <h3>User Management</h3>
-                    <p>Manage all system users</p>
-                    <a href="/admin/users" class="btn">Manage Users</a>
-                </div>
-                <div class="control-card">
-                    <h3>Reports</h3>
-                    <p>View and manage emergency reports</p>
-                    <a href="/admin/reports" class="btn">View Reports</a>
-                </div>
-                <div class="control-card">
-                    <h3>System Settings</h3>
-                    <p>Configure system parameters</p>
-                    <a href="/admin/settings" class="btn">Settings</a>
-                </div>
-            </div>
-        </section>
+      <section class="admin-controls">
+        <h2>System Management</h2>
+        <div class="controls-grid">
+          <div class="control-card">
+            <h3>User Management</h3>
+            <p>Manage all system users</p>
+            <a href="/admin/users" class="btn">Manage Users</a>
+          </div>
+          <div class="control-card">
+            <h2>View Reports</h2>
+            <p>Here is the list of reports which are currently active</p>
+            <table border="1">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>Status</th>
+                  <th>Responder</th>
+                </tr>
+              </thead>
+              <tbody id="report-table-body">
+                <!-- Data will be populated here -->
+              </tbody>
+            </table>
+          </div>
+          <div class="control-card">
+            <h3>System Settings</h3>
+            <p>Configure system parameters</p>
+            <a href="/admin/settings" class="btn">Settings</a>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer>
-        <p>© 2025 Emergency Response System</p>
+      <p>© 2025 Emergency Response System</p>
     </footer>
-</body>
+    <script>
+      // Populate the report table with data from the API
+      async function getReports() {
+        try {
+          const res = await fetch("/emergency/getall");
+          const reports = await res.json();
+          const reportTableBody = document.getElementById("report-table-body");
+          reportTableBody.innerHTML = "";
+          reports.forEach((report) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td>${report.user.name}</td>
+                        <td>${report.type}</td>
+                        <td>${report.description}</td>
+                        <td>${report.latitude}</td>
+                        <td>${report.longitude}</td>
+                        <td>${report.status}</td>
+                        <td>
+                            ${
+                              report.status === "Pending"
+                                ? `
+                            <select class="responder-select" data-report-id="${report._id}">
+                                <option value="">Select Responder</option>
+                                <!-- Responders will be populated via JavaScript -->
+                            </select>
+                            <button class="assign-btn" data-report-id="${report._id}">Assign</button>
+                            `
+                                : (report.assignedResponder && report.assignedResponder.name) 
+                                ? report.assignedResponder.name 
+                                : "Not Assigned"
+                            }
+                        </td>
+                    `;
+            row.classList.add(
+              `status-${report.status.toLowerCase().replace(" ", "-")}`
+            );
+            reportTableBody.appendChild(row);
+          });
+          await populateResponders();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      // Fetch available responders
+      async function getResponders() {
+        try {
+          const res = await fetch("/users/admin/responders");
+          const json = await res.json();
+          return json;
+        } catch (err) {
+          console.error("Error fetching responders:", err);
+        }
+      }
+
+      // Populate responder dropdowns
+      async function populateResponders() {
+        const responders = await getResponders();
+        const selectElements = document.querySelectorAll(".responder-select");
+        selectElements.forEach((select) => {
+          select.innerHTML = '<option value="">Select Responder</option>'; 
+          responders.forEach((responder) => {
+            const option = document.createElement("option");
+            option.value = responder._id;
+            option.textContent = responder.name;
+            select.appendChild(option);
+          });
+        });
+      }
+
+      // Handle responder assignment
+      document.addEventListener("click", async (e) => {
+        console.log("Click detected on:", e.target);
+        if (e.target.classList.contains("assign-btn")) {
+          const reportId = e.target.dataset.reportId;
+          const select = document.querySelector(
+            `.responder-select[data-report-id="${reportId}"]`
+          );
+          const responderId = select.value;
+
+          if (!responderId) {
+            alert("Please select a responder");
+            return;
+          }
+
+          try {
+              const response = await fetch(
+              `/emergency/${reportId}/assign`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ responderId }),
+              }
+            );
+
+
+            if (response.ok) {
+              alert("Responder assigned successfully");
+              getReports(); // Refresh the reports
+            } else {
+              throw new Error("Failed to assign responder");
+            }
+          } catch (err) {
+            console.error("Error assigning responder:", err);
+            alert("Error assigning responder");
+          }
+        }
+      });
+
+      // Initial setup
+      populateResponders();
+      getReports();
+    </script>
+  </body>
 </html>

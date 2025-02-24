@@ -2,7 +2,13 @@ var express = require("express");
 var path = require('path');
 var multer = require('multer');
 var authenticate = require("../middlewares/authMiddleware");
-const { createReport } = require("../controllers/emergencyControllers");
+const { 
+    createReport, 
+    fetchReports, 
+    assignResponder,
+    getAssignedReports,
+    updateReportStatus 
+} = require("../controllers/emergencyControllers");
 var router = express.Router();
 
 //  Multer Storage Configuration
@@ -25,5 +31,17 @@ router.get("/create", function (req, res) {
 
 // Create a report
 router.post("/create", authenticate, upload.single("media"), createReport);
+
+// Fetch reports onto dashboard
+router.get('/getall',authenticate,fetchReports);
+
+// Assign responder to report
+router.post('/:id/assign', authenticate, assignResponder);
+
+// Get assigned reports for responder
+router.get('/assigned', authenticate, getAssignedReports);
+
+// Update report status
+router.put('/:id/status', authenticate, updateReportStatus);
 
 module.exports = router;

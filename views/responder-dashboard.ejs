@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responder Dashboard</title>
     <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            padding: 4px 8px;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -20,14 +40,21 @@
             <h2>Emergency Management</h2>
             <div class="controls-grid">
                 <div class="control-card">
-                    <h3>Active Incidents</h3>
-                    <p>View and manage active emergencies</p>
-                    <a href="/responder/incidents" class="btn">View Incidents</a>
-                </div>
-                <div class="control-card">
-                    <h3>My Assignments</h3>
-                    <p>View your assigned emergencies</p>
-                    <a href="/responder/assignments" class="btn">My Assignments</a>
+                    <h3>My Assigned Reports</h3>
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assigned-reports">
+                            <!-- Reports will be populated here -->
+                        </tbody>
+                    </table>
                 </div>
                 <div class="control-card">
                     <h3>Response Tools</h3>
@@ -37,6 +64,60 @@
             </div>
         </section>
     </main>
+    <script>
+        async function getAssignedReports() {
+            try {
+                const res = await fetch('/emergency/assigned');
+                const reports = await res.json();
+                const tableBody = document.getElementById('assigned-reports');
+                tableBody.innerHTML = '';
+                
+                reports.forEach(report => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${report.type}</td>
+                        <td>${report.description}</td>
+                        <td>${report.latitude}, ${report.longitude}</td>
+                        <td>${report.status}</td>
+                        <td>
+                            ${report.status !== 'Resolved' ? `
+                            <button onclick="updateReportStatus('${report._id}', 'In Progress')">Start</button>
+                            <button onclick="updateReportStatus('${report._id}', 'Resolved')">Resolved</button>
+                            ` : ''}
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Error fetching assigned reports:', err);
+            }
+        }
+
+        async function updateReportStatus(reportId, status) {
+            try {
+                const response = await fetch(`/emergency/${reportId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                if (response.ok) {
+                    alert('Status updated successfully');
+                    getAssignedReports();
+                } else {
+                    throw new Error('Failed to update status');
+                }
+            } catch (err) {
+                console.error('Error updating report status:', err);
+                alert('Error updating status');
+            }
+        }
+
+        // Initial load
+        getAssignedReports();
+    </script>
 
     <footer>
         <p>© 2025 Emergency Response System</p>
