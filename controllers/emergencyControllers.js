@@ -23,7 +23,7 @@ const createReport = async (req, res) => {
 // Fetch Reports
 const fetchReports = async (req,res)=>{
   try{
-    const reports = await emergencyReports.find().populate("user","name").populate("assignedResponder","name");
+    const reports = await emergencyReports.find({status:{$ne:"Resolved"}}).populate("user","name").populate("assignedResponder","name");
     res.json(reports);
   }catch(err){
     console.log(err)
@@ -64,10 +64,17 @@ const assignResponder = async (req, res) => {
 // Get reports assigned to current responder
 const getAssignedReports = async (req, res) => {
     try {
-        const reports = await emergencyReports.find({ 
-            assignedResponder: req.user.id 
-        }).populate('user', 'name');
-        res.json(reports);
+        const resolvedReports = await emergencyReports.find({ 
+            assignedResponder: req.user.id,
+            status: "Resolved"
+        }).populate('user', 'name').sort({ createdAt: -1 }); // Sort by createdAt descending
+
+        const unresolvedReports = await emergencyReports.find({ 
+            assignedResponder: req.user.id,
+            status: { $ne: "Resolved" }
+        }).populate('user', 'name').sort({ createdAt: -1 }); // Sort by createdAt descending
+
+        res.json({ resolvedReports, unresolvedReports });
     } catch (err) {
         console.error('Error fetching assigned reports:', err);
         res.status(500).json({ error: 'Failed to fetch assigned reports' });

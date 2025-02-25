@@ -1,93 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
-  </head>
-  <body>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #007bff !important;
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .table thead {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
     <header>
-      <h1>User Dashboard</h1>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/auth/logout">Logout</a>
-      </nav>
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <a class="navbar-brand" href="/">Emergency Response</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     </header>
 
-    <main>
-      <section class="user-controls">
-        <h2>Emergency Services</h2>
-        <div class="controls-grid">
-          <div class="control-card">
-            <h3>Report Emergency</h3>
-            <p>Submit a new emergency report</p>
-            <a href="/emergency/create" class="btn">Report Emergency</a>
-          </div>
-          <div class="control-card">
-            <h3>My Reports</h3>
-            <p>View your submitted reports</p>
-            <table border="1">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Type</th>
-                  <th>Description</th>
-                  <th>Latitude</th>
-                  <th>Longitude</th>
-                  <th>Status</th>
-                  <th>Responder</th>
-                </tr>
-              </thead>
-              <tbody id="report-table-body">
-                <!-- Data will be populated here -->
-              </tbody>
-            </table>
-            <!-- <a href="/user/reports" class="btn">My Reports</a> -->
-          </div>
-          <div class="control-card">
-            <h3>Safety Resources</h3>
-            <p>Access safety information and resources</p>
-            <a href="/user/resources" class="btn">Safety Resources</a>
-          </div>
+    <div class="container mt-4">
+        <h2 class="text-center text-primary">User Dashboard</h2>
+        
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-danger">
+                    <div class="card-body text-center">
+                        <h4>Report Emergency</h4>
+                        <p>Submit a new emergency report</p>
+                        <a href="/emergency/create" class="btn btn-light">Report Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-warning">
+                    <div class="card-body text-center">
+                        <h4>My Reports</h4>
+                        <p>View your submitted reports</p>
+                        <a href="#reports" class="btn btn-light">View Reports</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success">
+                    <div class="card-body text-center">
+                        <h4>Safety Resources</h4>
+                        <p>Access safety information</p>
+                        <a href="/user/resources" class="btn btn-light">View Resources</a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </section>
-    </main>
 
-    <footer>
-      <p>© 2025 Emergency Response System</p>
+        <div id="reports" class="mt-5">
+            <h3 class="text-primary">My Reports</h3>
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Created At</th>
+                        <th>Status</th>
+                        <th>Responder</th>
+                    </tr>
+                </thead>
+                <tbody id="report-table-body">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer class="text-center mt-4 py-3 bg-light">
+        <p>&copy; 2025 Emergency Response System</p>
     </footer>
+
     <script>
-      async function getUserReports(){
-          try{
-              const response = await fetch('/users/user/reports',{
-                  method: 'GET',
-                  headers: {
-                      'Content-Type': 'application/json',
-                  },
-                  credentials:"include",
-              });
-              const reports = await response.json();
-              const reportTableBody = document.getElementById('report-table-body');
-              reportTableBody.innerHTML = '';
-              reports.forEach((report)=>{
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td>${report.user.name}</td>
-                <td>${report.type}</td>
-                <td>${report.description}</td>
-                <td>${report.latitude}</td>
-                <td>${report.longitude}</td>
-                <td>${report.status}</td>
-                <td>${report.assignedResponder.name}</td>`;
-                reportTableBody.appendChild(row);
-              });
-          }
-      catch(err){
-        console.log(err);
-      }
-    }
-    getUserReports();
+        async function getUserReports(){
+            try{
+                const response = await fetch('/users/user/reports', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: "include",
+                });
+                const reports = await response.json();
+                const reportTableBody = document.getElementById('report-table-body');
+                reportTableBody.innerHTML = '';
+                reports.forEach((report) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${report.user.name}</td>
+                    <td>${report.type}</td>
+                    <td>${report.description}</td>
+                    <td>${report.latitude}</td>
+                    <td>${report.longitude}</td>
+                    <td>${new Date(report.createdAt).toLocaleString()}</td>
+                    <td>${report.status}</td>
+                    <td>${report.assignedResponder?.name || 'N/A'}</td>`;
+                    reportTableBody.appendChild(row);
+                });
+            } catch(err){
+                console.log(err);
+            }
+        }
+        getUserReports();
     </script>
-  </body>
+</body>
 </html>
