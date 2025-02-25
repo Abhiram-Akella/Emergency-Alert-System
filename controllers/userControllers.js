@@ -1,6 +1,7 @@
 const User = require('../models/schema');
+const EmergencyReports = require('../models/emergencyreports');
 
-// Admin Controller
+// Admin Controllers
 const admin = async(req,res)=>{
     res.render('admin-dashboard', { title: 'Admin Dashboard' });
 }
@@ -18,14 +19,27 @@ const getResponders = async (req, res) => {
     }
 };
 
-// Responder Controller
+// Responder Controllers
 const responder = async(req,res)=>{
     res.render('responder-dashboard', { title: 'Responder Dashboard' });
 }
 
-// User Controller
+// User Controllers
 const user = async(req,res)=>{
     res.render('user-dashboard', { title: 'User Dashboard' });
 }
 
-module.exports = {admin, responder, user, getResponders};
+const getUserReports = async(req,res)=>{
+    try{
+        const id = req.user.id;
+        const reports = await EmergencyReports.find({ user: id })
+        .populate("user","name")
+        .populate("assignedResponder","name");
+        res.json(reports);
+    }catch(err){
+        console.error('Error fetching user reports:', err);
+        res.status(500).json({ error: 'Failed to fetch user reports' });
+    }
+}
+
+module.exports = {admin, responder, user, getResponders, getUserReports};  // Exporting the controllers

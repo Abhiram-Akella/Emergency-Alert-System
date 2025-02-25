@@ -1,13 +1,13 @@
 var express = require("express");
-var path = require('path');
-var multer = require('multer');
+var path = require("path");
+var multer = require("multer");
 var authenticate = require("../middlewares/authMiddleware");
-const { 
-    createReport, 
-    fetchReports, 
-    assignResponder,
-    getAssignedReports,
-    updateReportStatus 
+const {
+  createReport,
+  fetchReports,
+  assignResponder,
+  getAssignedReports,
+  updateReportStatus,
 } = require("../controllers/emergencyControllers");
 var router = express.Router();
 
@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 });
 
 // Multer Middleware
-const upload = multer({ storage: storage});
+const upload = multer({ storage: storage });
 
 // Get the emergency report page
 router.get("/create", function (req, res) {
@@ -33,15 +33,15 @@ router.get("/create", function (req, res) {
 router.post("/create", authenticate, upload.single("media"), createReport);
 
 // Fetch reports onto dashboard
-router.get('/getall',authenticate,fetchReports);
+router.get("/getall", authenticate, fetchReports);
 
 // Assign responder to report
-router.post('/:id/assign', authenticate, assignResponder);
+router.post("/:id/assign", authenticate, assignResponder);
 
 // Get assigned reports for responder
-router.get('/assigned', authenticate, getAssignedReports);
+router.get("/assigned", authenticate, getAssignedReports);
 
 // Update report status
-router.put('/:id/status', authenticate, updateReportStatus);
+router.put("/:id/status", authenticate, updateReportStatus);
 
 module.exports = router;
