@@ -14,6 +14,8 @@ const createReport = async (req, res) => {
       longitude: req.body.longitude,
     });
     await newReport.save();
+    // Emit event to admins using io.emit
+    req.app.locals.io.emit('reportUpdated',{message:"New Report has been created",report:newReport});
     res.status(201).json({ message: "Emergency report created successfully" });
   } catch (err) {
     console.log(err);
@@ -53,6 +55,8 @@ const assignResponder = async (req, res) => {
     if (!updatedReport) {
       return res.status(404).json({ error: 'Report not found' });
     }
+    // Emit event to responders
+    req.app.locals.io.emit('reportAssigned',{message:"New Report has been assigned",report:updatedReport});
 
     res.json({ message: 'Responder assigned successfully', report: updatedReport });
   } catch (err) {
@@ -92,6 +96,9 @@ const updateReportStatus = async (req, res) => {
             { status },
             { new: true }
         );
+        // Collect event status and emit event to all clients having the reports
+        let reportStatus = updatedReport.status;
+        req.app.locals.io.emit('reportStatusUpdated',{message:`Report ${id} is now ${reportStatus}`,report:updatedReport});
 
         if (!updatedReport) {
             return res.status(404).json({ error: 'Report not found' });

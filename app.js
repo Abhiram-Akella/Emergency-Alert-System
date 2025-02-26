@@ -10,6 +10,7 @@ require('dotenv').config()
 const { authenticate, authorize } = require('./middlewares/authMiddleware');
 const errorHandler = require('./middlewares/errorMiddleware');
 
+//Import Routes
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
@@ -28,8 +29,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Apply authentication middleware to protected routes except registration
-// Routes
+// Use Routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
