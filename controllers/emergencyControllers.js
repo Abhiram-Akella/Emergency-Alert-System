@@ -1,4 +1,6 @@
+var User = require('../models/schema')
 var emergencyReports = require("../models/emergencyreports");
+const sendEmail = require("../config/email");
 
 // createReport
 const createReport = async (req, res) => {
@@ -16,6 +18,9 @@ const createReport = async (req, res) => {
     await newReport.save();
     // Emit event to admins using io.emit
     req.app.locals.io.emit('reportUpdated',{message:"New Report has been created",report:newReport});
+    // Send Email Notification
+    // const userInfo = await User.findById(id).select("name email");
+    // sendEmail(userInfo.email,`Report ID: ${newReport._id}`,`<h1>Hello ${userInfo.name} !</h1> <p>Thanks for reporting the emergency. Please be assured that our responders will reach the location soon and sort out the issue. Until then please go through our emergency assistance guide for your reference.</p><br> <p> Best Regards, </p><br> <p><b>Emeergency Response Team </b></p>`);
     res.status(201).json({ message: "Emergency report created successfully" });
   } catch (err) {
     console.log(err);
@@ -99,7 +104,12 @@ const updateReportStatus = async (req, res) => {
         // Collect event status and emit event to all clients having the reports
         let reportStatus = updatedReport.status;
         req.app.locals.io.emit('reportStatusUpdated',{message:`Report ${id} is now ${reportStatus}`,report:updatedReport});
-
+        
+        // Send Email Notification when report is resolved
+        //if (reportStatus === "Resolved") {
+          //const userInfo = await emergencyReports.findById(id).populate("user");
+          //sendEmail(userInfo.user.email,`Report ID: ${id} Resolved`,`<h2>Hello ${userInfo.user.name} !</h2> <p>This email is to inform you that your report has been resolved and necessary actions have been taken by the responders. We thank you for timely action of reporting the emergency.</p><br> <p>Always remember to raise an emergency in case of any mishaps.</p><br> <p> Best Regards, </p><br> <p><b>Emergency Response Team </b></p>`);
+        //}
         if (!updatedReport) {
             return res.status(404).json({ error: 'Report not found' });
         }
