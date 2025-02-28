@@ -9,7 +9,7 @@ const register = async (req, res) => {
     const { name, email, password, phone,latitude,longitude, role } = req.body;
     const exists = await User.findOne({ email: email });
     if (exists) {
-      return res.status(400).send("User already exists!");
+      return res.status(400).redirect('/auth/register?error=invalid');
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -35,7 +35,7 @@ const login = async (req, res) => {
   try {
     const user = await User.findOne({ email: email });
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(400).send("Invalid credentials");
+      return res.status(400).redirect('/auth/login?error=invalid');
     }
 
     if(latitude&&longitude){

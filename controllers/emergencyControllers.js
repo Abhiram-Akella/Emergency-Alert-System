@@ -16,6 +16,7 @@ const createReport = async (req, res) => {
       longitude: req.body.longitude,
     });
     await newReport.save();
+    await User.findByIdAndUpdate(id,{$push:{emergencyReports:newReport._id}});
     // Emit event to admins using io.emit
     req.app.locals.io.emit('reportUpdated',{message:"New Report has been created",report:newReport});
     // Send Email Notification
