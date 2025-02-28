@@ -8,6 +8,8 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <link rel="stylesheet" href="/stylesheets/style.css" />
     <style>
       body {
@@ -47,6 +49,11 @@
         </div>
       </div>
     </nav>
+
+    <!-- Hidden Bootstrap Toast Container to display notifications -->
+    <div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+      <!-- Toasts will be dynamically added here -->
+  </div>
 
     <div class="container">
       <div class="row mb-4">
@@ -101,8 +108,16 @@
           const res = await fetch("/emergency/getall");
           const reports = await res.json();
           const reportTableBody = document.getElementById("report-table-body");
+          if (reports.length===0){
+            reportTableBody.innerHTML = `
+                  <tr>
+                    <td colspan="100%" style="text-align: center; font-size: 1.5rem; font-weight: bold; color: #6c757d; padding: 20px;">
+                      No Active Reports
+                    </td>
+                  </tr>`;
+                }
+          else{
           reportTableBody.innerHTML = "";
-
           reports.forEach((report) => {
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -119,15 +134,21 @@
                     <select class="form-select responder-select" data-report-id="${report._id}">
                       <option value="">Select Responder</option>
                     </select>
-                    <button class="btn btn-sm btn-success assign-btn" data-report-id="${report._id}">Assign</button>
                   `
                     : report.assignedResponder?.name || "Not Assigned"
                 }
               </td>
               <td>${new Date(report.createdAt).toLocaleString()}</td>
+              <td> 
+              ${report.status === "Pending"?
+                `<button class="btn btn-sm btn-success assign-btn" data-report-id="${report._id}">Assign</button>`
+                : ""
+              }
+              </td>
             `;
             reportTableBody.appendChild(row);
           });
+        }
           await populateResponders();
         } catch (err) {
           console.log(err);
@@ -187,6 +208,7 @@
       getReports();
     </script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/javascripts/socket-client.js"></script>    
+    <script src="/javascripts/socket-client.js"></script>   
+    <script src="/javascripts/toast.js"></script>
   </body>
 </html>
