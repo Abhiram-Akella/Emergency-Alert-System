@@ -1,11 +1,102 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Alert System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+            flex: 1;
+        }
+        .container-fluid{
+          padding: 50px;
+        }
+        .card {
+            transition: transform 0.3s;
+            border-radius: 15px;
+            padding: 90px;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card-title{
+          font-size:28px;
+        }
+        .card-text{
+          font-size:23px;
+        }
+        .jumbotron {
+            background: linear-gradient(90deg, #007bff, #6610f2);
+            color: white;
+            padding: 60px 20px;
+            margin: 0;
+            border-radius:0;
+        }
+        .btn-light:hover {
+            background-color: #d6d8db;
+        }
+        footer {
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            font-size:20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow w-100">
+        <a class="navbar-brand" href="#">🚑 Emergency Alert System</a>
+        <div class="ml-auto">
+            <a href="/auth/login" class="btn btn-outline-light">Login</a>
+            <a href="/auth/register" class="btn btn-outline-warning ml-2">Register</a>
+        </div>
+    </nav>
+    
+    <header class="jumbotron text-center w-100">
+        <h1 class="display-4 font-weight-bold">Your Safety, Our Priority</h1>
+        <p class="lead">Instant emergency reporting, real-time alerts, and AI-powered assistance.</p>
+    </header>
+
+    <section class="container-fluid content px-5">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="card shadow-lg bg-primary text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🚨 Report Emergencies Instantly</h5>
+                        <p class="card-text">Submit emergency reports in real time with location tracking. Ensure help reaches you faster by providing accurate details and optional media uploads.</p>                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-lg bg-danger text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🔔 Get Real-Time Notifications</h5>
+                        <p class="card-text">Stay updated with live alerts and emergency status updates. Track the response progress and receive notifications when help is on the way.</p>                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-lg bg-success text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🤖 Get AI Assistance</h5>
+                        <p class="card-text">Chat with AI for safety tips and guidance during emergencies. Get immediate advice on first aid, evacuation routes, and crisis management.</p>                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center w-100">
+        <p>&copy; 2025 Emergency Alert System | Stay Safe, Stay Alert</p>
+    </footer>
+</body>
 </html>
