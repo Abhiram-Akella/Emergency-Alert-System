@@ -34,10 +34,24 @@
       <input type="hidden" id="longitude" name="longitude">
       <div class="form-group">
         <label for="role">Role:</label>
-        <select id="role" name="role" class="form-control">
+        <select id="role" name="role" class="form-control" onchange="toggleFields()">
           <option value="user">User</option>
+          <option value="admin">Admin</option>
           <option value="responder">Responder</option>
         </select>
+      </div>
+      <div class="form-group" id="responder-type-group" style="display: none;">
+        <label for="responderType">Responder Type:</label>
+        <select id="responderType" name="responderType" class="form-control">
+          <option value="medical">Medical</option>
+          <option value="fire">Fire</option>
+          <option value="crime">Crime</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group" id="admin-passkey-group" style="display: none;">
+        <label for="adminPassKey">Admin PassKey:</label>
+        <input type="password" id="adminPassKey" name="adminPassKey" class="form-control">
       </div>
       <button type="submit" id="register-btn" class="btn btn-primary">Register</button>
 
@@ -50,6 +64,9 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('error')) {
             alert("User already exists!");
+            }
+            else if(urlParams.has('adminerror')){
+              alert("Invalid Admin PassKey. Please try again.");
             }
         };
 
@@ -68,6 +85,22 @@
       }); 
       getLocation();
     });
+
+    function toggleFields() {
+    var role = document.getElementById("role").value;
+    var responderTypeGroup = document.getElementById("responder-type-group");
+    var adminPassKeyGroup = document.getElementById("admin-passkey-group");
+    if (role === "responder") {
+      responderTypeGroup.style.display = "block";
+      adminPassKeyGroup.style.display = "none";
+    } else if (role === "admin") {
+      responderTypeGroup.style.display = "none";
+      adminPassKeyGroup.style.display = "block";
+    } else {
+      responderTypeGroup.style.display = "none";
+      adminPassKeyGroup.style.display = "none";
+    }
+  }
   </script>  
 </body>
 </html>

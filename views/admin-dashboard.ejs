@@ -101,7 +101,6 @@
     <footer class="text-center py-3 mt-4 bg-light">
       <p>© 2025 Emergency Response System</p>
     </footer>
-
     <script>
       async function getReports() {
         try {
@@ -118,7 +117,7 @@
                 }
           else{
           reportTableBody.innerHTML = "";
-          reports.forEach((report) => {
+          reports.forEach(async (report) => {
             const row = document.createElement("tr");
             row.innerHTML = `
               <td>${report.user.name}</td>
@@ -144,16 +143,35 @@
                 `<button class="btn btn-sm btn-success assign-btn" data-report-id="${report._id}">Assign</button>`
                 : ""
               }
+                <button class="btn btn-warning btn-sm" onclick="updateReportStatus('${report._id}', 'Resolved')">Resolved</button>
               </td>
             `;
             reportTableBody.appendChild(row);
-          });
+            await populateResponders(report.type, report._id);
+          });          
         }
-          await populateResponders();
         } catch (err) {
           console.log(err);
         }
       }
+
+      async function updateReportStatus(reportId, status) {
+    try {
+        const response = await fetch(`/emergency/${reportId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        if (response.ok) {
+            alert('Status updated successfully');
+        } else {
+            throw new Error('Failed to update status');
+        }
+    } catch (err) {
+        console.error('Error updating report status:', err);
+        alert('Error updating status');
+    }
+}
 
       async function getResponders() {
         try {
@@ -164,12 +182,14 @@
         }
       }
 
-      async function populateResponders() {
+      async function populateResponders(reportType, reportId) {
         const responders = await getResponders();
-        const selectElements = document.querySelectorAll(".responder-select");
+        const selectElements = document.querySelectorAll(`.responder-select[data-report-id="${reportId}"]`);
         selectElements.forEach((select) => {
           select.innerHTML = '<option value="">Select Responder</option>';
-          responders.forEach((responder) => {
+          responders
+           .filter((responder) => responder.responderType.toLowerCase() === reportType.toLowerCase())
+          .forEach((responder) => {
             const option = document.createElement("option");
             option.value = responder._id;
             option.textContent = responder.name;

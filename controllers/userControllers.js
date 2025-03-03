@@ -9,9 +9,7 @@ const admin = async(req,res)=>{
 // Get available responders
 const getResponders = async (req, res) => {
     try {
-        const responders = await User.find({ role: 'responder' })
-            .select('_id name')
-            .lean();
+        const responders = await User.find({ role: 'responder' }).select("name responderType");
         res.json(responders);
     } catch (err) {
         console.error('Error fetching responders:', err);

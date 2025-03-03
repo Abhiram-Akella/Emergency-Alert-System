@@ -1,15 +1,18 @@
 const User = require("../models/schema");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-
+require("dotenv").config();
 // Register controller
 const register = async (req, res) => {
   try {
     // extract details and create a new user
-    const { name, email, password, phone,latitude,longitude, role } = req.body;
+    const { name, email, password, phone, latitude, longitude, role, responderType, adminPassKey } = req.body;
     const exists = await User.findOne({ email: email });
     if (exists) {
       return res.status(400).redirect('/auth/register?error=invalid');
+    }
+    if (role === "admin" && adminPassKey !==  process.env.ADMIN_PASSKEY) {
+      return res.status(400).redirect('/auth/register?adminerror=invalid');
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -19,6 +22,7 @@ const register = async (req, res) => {
       password: hashedPassword,
       phone,
       role,
+      responderType: role === "responder" ? responderType : undefined,
       location: {latitude,longitude},
     });
     await newUser.save();
