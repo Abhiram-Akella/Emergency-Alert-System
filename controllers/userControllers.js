@@ -22,6 +22,20 @@ const responder = async(req,res)=>{
     res.render('responder-dashboard', { title: 'Responder Dashboard' });
 }
 
+const responderType = async(req,res)=>{
+    try{
+        const {type} = req.query;
+        if(!type){
+            return res.status(400).json({error: 'Responder type is required'});
+        }
+        const responders = await User.find({ role: 'responder', responderType: type }).select("name responderType location");
+        res.json(responders);
+    } catch(err){
+        console.error('Error fetching responders:', err);
+        res.status(500).json({ error: 'Failed to fetch responders' });
+    }
+}
+
 // User Controllers
 const user = async(req,res)=>{
     res.render('user-dashboard', { title: 'User Dashboard' });
@@ -40,4 +54,4 @@ const getUserReports = async(req,res)=>{
     }
 }
 
-module.exports = {admin, responder, user, getResponders, getUserReports};  // Exporting the controllers
+module.exports = {admin, responder,responderType, user, getResponders, getUserReports};  // Exporting the controllers

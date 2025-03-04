@@ -1,177 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-      body {
-        background-color: #f8f9fa;
-      }
-      .navbar {
-        margin-bottom: 20px;
-      }
-      .card {
-        border-radius: 12px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-      }
-      .status-pending {
-        background-color: #fff3cd;
-      }
-      .status-in-progress {
-        background-color: #d1ecf1;
-      }
-      .status-resolved {
-        background-color: #d4edda;
-      }
-      .table th, .table td {
-        vertical-align: middle;
-      }
+        body, html {
+            margin: 0;
+            padding: 0;
+            background: #f4f4f9;
+            color: #333;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .container-fluid {
+            flex: 1;
+        }
+        .navbar {
+            background: linear-gradient(45deg, #ff9ff3, #feca57);
+            padding: 15px;
+            border: none;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        .table thead {
+            background: #70a1ff;
+            color: white;
+        }
+        .table tbody tr:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+        footer {
+            color: black;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: large;
+        }
     </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container">
-        <a class="navbar-brand" href="#">Admin Dashboard</a>
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link btn btn-danger text-white" href="/auth/logout">Logout</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+</head>
+<body>
+    <div class="main-content">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand">Admin Dashboard</a>
+                <div class="ms-auto">
+                    <a class="btn btn-dark" href="/auth/logout">Logout</a>
+                </div>
+            </div>
+        </nav>
 
-    <!-- Hidden Bootstrap Toast Container to display notifications -->
-    <div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
-      <!-- Toasts will be dynamically added here -->
-  </div>
-
-    <div class="container">
-      <div class="row mb-4">
-        <div class="col-md-4">
-          <div class="card p-3">
-            <h4>User Management</h4>
-            <p>Manage all system users</p>
-            <a href="/admin/users" class="btn btn-primary">Manage Users</a>
-          </div>
+        <div class="container mt-4">
+            <div class="card p-3">
+                <h4>Active Reports</h4>
+                <div class="form-group">
+                  <label for="reportTypeFilter">Filters:</label>
+                  <select id="reportTypeFilter" class="form-control" onchange="getReports(this.value)">
+                    <option value="">All</option>
+                    <option value="medical">Medical</option>
+                    <option value="fire">Fire</option>
+                    <option value="crime">Crime</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th>Status</th>
+                                <th>Responder</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-          <div class="card p-3">
-            <h4>System Settings</h4>
-            <p>Configure system parameters</p>
-            <a href="/admin/settings" class="btn btn-secondary">Settings</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="card p-3">
-        <h4>Active Reports</h4>
-        <div class="table-responsive">
-          <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-              <tr>
-                <th>User</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Status</th>
-                <th>Responder</th>
-                <th>Created At</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="report-table-body">
-              <!-- Data will be populated here -->
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
+
+      <!-- Map Modal -->
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="mapModalLabel">Emergency Location</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div id="map"></div>
+              </div>
+          </div>
+      </div>
+  </div>
 
     <footer class="text-center py-3 mt-4 bg-light">
       <p>© 2025 Emergency Response System</p>
     </footer>
     <script>
-      async function getReports() {
+      async function getReports(filter = "") {
         try {
           const res = await fetch("/emergency/getall");
           const reports = await res.json();
           const reportTableBody = document.getElementById("report-table-body");
-          if (reports.length===0){
+          if (reports.length === 0) {
             reportTableBody.innerHTML = `
                   <tr>
                     <td colspan="100%" style="text-align: center; font-size: 1.5rem; font-weight: bold; color: #6c757d; padding: 20px;">
                       No Active Reports
                     </td>
                   </tr>`;
-                }
-          else{
-          reportTableBody.innerHTML = "";
-          reports.forEach(async (report) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td>${report.user.name}</td>
-              <td>${report.type}</td>
-              <td>${report.description}</td>
-              <td>${report.latitude}</td>
-              <td>${report.longitude}</td>
-              <td class="status-${report.status.toLowerCase().replace(" ", "-")}">${report.status}</td>
-              <td>
-                ${
-                  report.status === "Pending"
-                    ? `
-                    <select class="form-select responder-select" data-report-id="${report._id}">
-                      <option value="">Select Responder</option>
-                    </select>
-                  `
-                    : report.assignedResponder?.name || "Not Assigned"
-                }
-              </td>
-              <td>${new Date(report.createdAt).toLocaleString()}</td>
-              <td> 
-              ${report.status === "Pending"?
-                `<button class="btn btn-sm btn-success assign-btn" data-report-id="${report._id}">Assign</button>`
-                : ""
+          } else {
+            reportTableBody.innerHTML = "";
+            reports.forEach(async (report) => {
+              if (filter && report.type.toLowerCase() !== filter.toLowerCase()) {
+                return;
               }
-                <button class="btn btn-warning btn-sm" onclick="updateReportStatus('${report._id}', 'Resolved')">Resolved</button>
-              </td>
-            `;
-            reportTableBody.appendChild(row);
-            await populateResponders(report.type, report._id);
-          });          
-        }
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${report.user.name}</td>
+                <td>${report.type}</td>
+                <td>${report.description}</td>
+                <td>${report.latitude}</td>
+                <td>${report.longitude}</td>
+                <td class="status-${report.status.toLowerCase().replace(" ", "-")}">${report.status}</td>
+                <td>
+                  ${
+                    report.status === "Pending"
+                      ? `
+                        <select class="form-select responder-select" data-report-id="${report._id}">
+                          <option value="">Select Responder</option>
+                        </select>
+                      `
+                      : report.assignedResponder?.name || "Not Assigned"
+                  }
+                </td>
+                <td>${new Date(report.createdAt).toLocaleString()}</td>
+                <td>
+                  ${report.status === "Pending" ?
+                    `<button class="btn btn-sm btn-success assign-btn" data-report-id="${report._id}">Assign</button>`
+                    : ""
+                  }
+                  <button class="btn btn-warning btn-sm" onclick="updateReportStatus('${report._id}', 'Resolved')">Resolved</button>
+                  <button class="btn btn-primary btn-sm" onclick="showMap(${report.latitude}, ${report.longitude}, '${report.type.toLowerCase()}')">View Map</button>
+                </td>
+              `;
+              reportTableBody.appendChild(row);
+              await populateResponders(report.type, report._id);
+            });
+          }
         } catch (err) {
           console.log(err);
         }
       }
-
-      async function updateReportStatus(reportId, status) {
-    try {
-        const response = await fetch(`/emergency/${reportId}/status`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
-        });
-        if (response.ok) {
-            alert('Status updated successfully');
-        } else {
-            throw new Error('Failed to update status');
-        }
-    } catch (err) {
-        console.error('Error updating report status:', err);
-        alert('Error updating status');
-    }
-}
 
       async function getResponders() {
         try {
@@ -197,38 +204,55 @@
           });
         });
       }
+      let mapInstance = null;
+       function showMap(lat, lng, type) {
+    const modal = new bootstrap.Modal(document.getElementById('mapModal'));
+    modal.show();
+    setTimeout(async () => {
+      if(mapInstance!==null){
+        mapInstance.remove();
+        mapInstance =null;
+        document.getElementById('map').innerHTML="";
+      }
 
-      document.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("assign-btn")) {
-          const reportId = e.target.dataset.reportId;
-          const select = document.querySelector(`.responder-select[data-report-id="${reportId}"]`);
-          const responderId = select.value;
-          if (!responderId) {
-            alert("Please select a responder");
-            return;
-          }
-          try {
-            const response = await fetch(`/emergency/${reportId}/assign`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ responderId }),
+      mapInstance = L.map('map').setView([lat, lng], 14);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(mapInstance);
+
+        // Red Marker for Emergency Location
+        L.marker([lat, lng], { icon: L.icon({ 
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
+        })})
+        .addTo(mapInstance)
+        .bindPopup(`<b>Emergency Location</b><br>Type: ${type}`)
+        .openPopup();
+
+        try {
+            // Fetch responders from the backend
+            const res = await fetch(`/users/responder/type?type=${type}`);
+            const responders = await res.json();
+            responders.forEach(responder => {
+                L.marker([responder.location.latitude, responder.location.longitude], { icon: L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+                    iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
+                })})
+                .addTo(mapInstance)
+                .bindPopup(`<b>Responder: ${responder.name}</b><br>Status: ${responder.status}`);
             });
-            if (response.ok) {
-              alert("Responder assigned successfully");
-              getReports();
-            } else {
-              throw new Error("Failed to assign responder");
-            }
-          } catch (err) {
-            console.error("Error assigning responder:", err);
-            alert("Error assigning responder");
-          }
+        } catch (error) {
+            console.error("Error fetching responders:", error);
         }
-      });
+    }, 500);
+}
+
       getReports();
     </script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/javascripts/socket-client.js"></script>   
+    <script src="/javascripts/socket-client.js"></script>
     <script src="/javascripts/toast.js"></script>
   </body>
 </html>
