@@ -8,6 +8,8 @@ const {
   assignResponder,
   getAssignedReports,
   updateReportStatus,
+  notifyNearbyUsers,
+  createDistressReport,
 } = require("../controllers/emergencyControllers");
 var router = express.Router();
 
@@ -43,5 +45,11 @@ router.get("/assigned", authenticate, getAssignedReports);
 
 // Update report status
 router.put("/:id/status", authenticate, updateReportStatus);
+
+// Notify nearby users of emergency
+router.post("/:reportId/notify-nearby", authenticate, notifyNearbyUsers);
+
+// Create a distress report
+router.post("/distress", createDistressReport);
 
 module.exports = router;

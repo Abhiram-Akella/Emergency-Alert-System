@@ -1,6 +1,7 @@
 const express = require("express");
-const { register, login } = require("../controllers/authControllers");
+const { register, login ,getloggedUser} = require("../controllers/authControllers");
 var router = express.Router();
+const authenticate = require("../middlewares/authMiddleware");
 
 // Serve registration page
 router.get("/register", function (req, res) {
@@ -17,6 +18,9 @@ router.post("/register", register);
 
 // Login a user
 router.post("/login", login);
+
+// Get logged in user details
+router.get("/user", authenticate,getloggedUser);
 
 // Log geolocation coordinates
 router.post("/log-coords", (req, res) => {

@@ -6,58 +6,17 @@
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/admin.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            background: #f4f4f9;
-            color: #333;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        .container-fluid {
-            flex: 1;
-        }
-        .navbar {
-            background: linear-gradient(45deg, #ff9ff3, #feca57);
-            padding: 15px;
-            border: none;
-        }
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            color: #333;
-        }
-        .table thead {
-            background: #70a1ff;
-            color: white;
-        }
-        .table tbody tr:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-        #map {
-            width: 100%;
-            height: 400px;
-        }
-        footer {
-            color: black;
-            text-align: center;
-            padding: 15px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            font-size: large;
-        }
-    </style>
+    
 </head>
 <body>
+  <!-- Hidden Bootstrap Toast Container to display notifications -->
+  <div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <!-- Toasts will be dynamically added here -->
+</div>
     <div class="main-content">
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid">
@@ -144,7 +103,7 @@
               }
               const row = document.createElement("tr");
               row.innerHTML = `
-                <td>${report.user.name}</td>
+                <td>${report.user?.name}</td>
                 <td>${report.type}</td>
                 <td>${report.description}</td>
                 <td>${report.latitude}</td>
@@ -164,11 +123,17 @@
                 <td>${new Date(report.createdAt).toLocaleString()}</td>
                 <td>
                   ${report.status === "Pending" ?
-                    `<button class="btn btn-sm btn-success assign-btn" data-report-id="${report._id}">Assign</button>`
+                    `<button class="btn btn-sm btn-success assign-btn" data-report-id="${report._id}" >Assign</button>`
                     : ""
                   }
                   <button class="btn btn-warning btn-sm" onclick="updateReportStatus('${report._id}', 'Resolved')">Resolved</button>
-                  <button class="btn btn-primary btn-sm" onclick="showMap(${report.latitude}, ${report.longitude}, '${report.type.toLowerCase()}')">View Map</button>
+                  <button class="btn btn-primary btn-sm" onclick="showMap(${report.latitude}, ${report.longitude}, '${report.type.toLowerCase()}','admin')">View Map</button>
+                  <select id="notifyRange-${report._id}" class="form-select form-select-sm">
+                  <option value="500">500m</option>
+                  <option value="1000" selected>1km</option>
+                  <option value="5000">5km</option>
+              </select>
+              <button class="btn btn-info btn-sm mt-1" onclick="notifyNearbyUsers('${report._id}')">Notify Others</button>
                 </td>
               `;
               reportTableBody.appendChild(row);
@@ -179,6 +144,51 @@
           console.log(err);
         }
       }
+
+      async function assignResponder(reportId) {
+            const selectElement = document.querySelector(`.responder-select[data-report-id="${reportId}"]`);
+            const responderId = selectElement.value;
+            if (!responderId) {
+                alert("Please select a responder.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/emergency/${reportId}/assign`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ responderId })
+                });
+                if (response.ok) {
+                    alert('Responder assigned successfully');
+                    getReports(document.getElementById("reportTypeFilter").value); // Reload reports after assigning responder
+                } else {
+                    throw new Error('Failed to assign responder');
+                }
+            } catch (err) {
+                console.error('Error assigning responder:', err);
+                alert('Error assigning responder');
+            }
+        }
+
+      async function updateReportStatus(reportId, status) {
+        try {
+          const response = await fetch(`/emergency/${reportId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+            });
+            if (response.ok) {
+              alert('Report status updated successfully');
+              getReports(document.getElementById("reportTypeFilter").value); // Reload reports after updating status
+              } else {
+                throw new Error('Failed to update status');
+              }
+            } catch (err) {
+              console.error('Error updating status:', err);
+              alert('Error updating status');
+              }
+              }
 
       async function getResponders() {
         try {
@@ -204,55 +214,42 @@
           });
         });
       }
-      let mapInstance = null;
-       function showMap(lat, lng, type) {
-    const modal = new bootstrap.Modal(document.getElementById('mapModal'));
-    modal.show();
-    setTimeout(async () => {
-      if(mapInstance!==null){
-        mapInstance.remove();
-        mapInstance =null;
-        document.getElementById('map').innerHTML="";
-      }
 
-      mapInstance = L.map('map').setView([lat, lng], 14);
+async function notifyNearbyUsers(reportId) {
+    const range = document.getElementById(`notifyRange-${reportId}`).value;
 
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(mapInstance);
+    try {
+        const response = await fetch(`/emergency/${reportId}/notify-nearby`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ range: parseInt(range) })
+        });
 
-        // Red Marker for Emergency Location
-        L.marker([lat, lng], { icon: L.icon({ 
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
-        })})
-        .addTo(mapInstance)
-        .bindPopup(`<b>Emergency Location</b><br>Type: ${type}`)
-        .openPopup();
+        const data = await response.json();
 
-        try {
-            // Fetch responders from the backend
-            const res = await fetch(`/users/responder/type?type=${type}`);
-            const responders = await res.json();
-            responders.forEach(responder => {
-                L.marker([responder.location.latitude, responder.location.longitude], { icon: L.icon({
-                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-                    iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
-                })})
-                .addTo(mapInstance)
-                .bindPopup(`<b>Responder: ${responder.name}</b><br>Status: ${responder.status}`);
-            });
-        } catch (error) {
-            console.error("Error fetching responders:", error);
+        if (response.ok) {
+            showToast(`Nearby users within ${range}m have been notified!`, "success");
+        } else {
+            showToast(`Error: ${data.message}`, "danger");
         }
-    }, 500);
+    } catch (err) {
+        console.error("Error notifying users:", err);
+        showToast("Failed to notify users.", "danger");
+    }
 }
+
+document.addEventListener("click", async (event) => {
+    if (event.target.classList.contains("assign-btn")) {
+        const reportId = event.target.getAttribute("data-report-id");
+        await assignResponder(reportId);
+    }
+});
 
       getReports();
     </script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/javascripts/socket-client.js"></script>
     <script src="/javascripts/toast.js"></script>
+    <script src="/javascripts/map.js"></script>
   </body>
 </html>
