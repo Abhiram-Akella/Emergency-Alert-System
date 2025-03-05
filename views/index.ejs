@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Alert System</title>
+    <title>🚑 Emergency Alert System</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/style.css">
     <style>
@@ -57,10 +57,11 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow w-100">
-        <a class="navbar-brand" href="#">🚑 Emergency Alert System</a>
+        <a class="navbar-brand" href="#"> Emergency Alert System</a>
         <div class="ml-auto">
             <a href="/auth/login" class="btn btn-outline-light">Login</a>
             <a href="/auth/register" class="btn btn-outline-warning ml-2">Register</a>
+            <button id="distressButton" class="btn btn-danger">Send Distress</button>
         </div>
     </nav>
     
@@ -98,5 +99,40 @@
     <footer class="text-center w-100">
         <p>&copy; 2025 Emergency Alert System | Stay Safe, Stay Alert</p>
     </footer>
+    <script>
+        document.getElementById("distressButton").addEventListener("click", async () => {
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                return;
+            }
+            const confirmDistress = confirm("Are you sure you want to send a distress alert?");
+            if (!confirmDistress) return; // Exit if user cancels
+    
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+    
+                try {
+                    const response = await fetch("/emergency/distress", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ latitude, longitude }),
+                    });
+    
+                    if (response.ok) {
+                        alert("Distress report sent successfully!");
+                    } else {
+                        alert("Failed to send distress report.");
+                    }
+                } catch (err) {
+                    console.error("Error:", err);
+                    alert("An error occurred.");
+                }
+            }, (error) => {
+                console.error("Geolocation error:", error);
+                alert("Unable to retrieve location.");
+            });
+        });
+    </script>
 </body>
 </html>
