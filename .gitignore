@@ -1,3 +1,6 @@
 /node_modules 
-/.env
-/notes.txt
+/backend/notes.txt
+/backend/tests
+/backend/coverage
+/backend/node_modules
+/backend/.env
