@@ -88,6 +88,10 @@ const createReport = async (req, res) => {
     });
   });
 
+  // //Send Email Notification
+  //   const userInfo = await User.findById(id).select("name email");
+  //   sendEmail(userInfo.email,`Report ID: ${newReport._id}`,`<h1>Hello ${userInfo.name} !</h1> <p>Thanks for reporting the emergency. Please be assured that our responders will reach the location soon and sort out the issue. Until then please go through our emergency assistance guide for your reference.</p><br> <p> Best Regards, </p><br> <p><b>Emeergency Response Team </b></p>`);
+
     res.status(200).json({ message: "Emergency report created successfully" });
   } catch (err) {
     console.log(err);
@@ -127,7 +131,7 @@ const fetchAllReports = async (req, res) => {
 const getAvailableReports = async (req, res) => {
   try {
     const responder = await User.findById(req.user.id);
-    if (!responder || responder.role !== "responder") {
+    if (!responder || responder.role ==='user') {
       return res.status(403).json({ error: "Not authorized" });
     }
 
@@ -339,6 +343,8 @@ const updateReportStatus = async (req, res) => {
       { new: true }
     ).populate("assignedResponder", "name");
 
+
+
     if (!updatedReport) {
       return res.status(404).json({ error: "Report not found" });
     }
@@ -355,6 +361,10 @@ const updateReportStatus = async (req, res) => {
         report: populatedReport,
       });
     }
+    if(status==='Resolved'|| status==='Assigned'){
+      updatedReport.updatedAt = Date.now();
+      await updatedReport.save();
+    }
 
     // Notify admins
     const admins = await User.find({ role: "admin" });
@@ -365,7 +375,6 @@ const updateReportStatus = async (req, res) => {
       });
     });
   }
-
     res.json({ message: "Status updated successfully", report: populatedReport });
   } catch (err) {
     console.error("Error updating report status:", err);

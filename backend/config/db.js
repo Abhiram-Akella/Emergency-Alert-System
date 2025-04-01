@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 const ConnectDB = async()=>{
     try{
-        await mongoose.connect('mongodb://127.0.0.1:27017/projectdb');
+        await mongoose.connect(process.env.MONGO_URI);
         console.log('MongoDB successfully connected');
     } catch(err){
         console.log(err.message);
