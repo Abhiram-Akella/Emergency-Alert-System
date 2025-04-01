@@ -203,7 +203,6 @@ const UserDashboard = () => {
             </div>
           ) : reports.length === 0 ? (
             <div className="text-center py-4">
-              <p className="text-gray-600">No reports yet</p>
               <Link to="/user/create-report" className="btn btn-primary mt-4">
                 Create First Report
               </Link>

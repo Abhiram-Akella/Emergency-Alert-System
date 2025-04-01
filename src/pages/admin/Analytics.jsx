@@ -342,8 +342,8 @@ const Analytics = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {typeDistribution.map((type) => {
-                  const responseTime = analyticsData.responseTimesByType.find(t => t._id === type._id)?.avgResponseTime+1 || 0
-                  const resolutionTime = analyticsData.resolutionTimesByType.find(t => t._id === type._id)?.avgResolutionTime+1 || 0
+                  const responseTime = analyticsData.responseTimesByType.find(t => t._id === type._id)?.avgResponseTime || 0
+                  const resolutionTime = analyticsData.resolutionTimesByType.find(t => t._id === type._id)?.avgResolutionTime || 0
                   const resolvedCount = analyticsData.reports.filter(r => r.type === type._id && r.status === 'Resolved').length
                   const resolutionRate = type.count > 0 ? Math.round((resolvedCount / type.count) * 100) : 0
                   
