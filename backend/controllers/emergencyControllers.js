@@ -15,15 +15,12 @@ const createReport = async (req, res) => {
     // Check for existing reports to avoid duplication
     const existingReport = await EmergencyReports.findOne({type:type,status:{$ne:"Resolved"}});
     if(existingReport){
-    const isDuplicate = (existingReport)=>{
       const existingLatitude = existingReport.latitude;
       const existingLongitude = existingReport.longitude;
       const distance = geolib.getDistance(
-        { latitude, longitude },
-        { existingLatitude,existingLongitude});
-      return distance <= 100;
-    };
-      if(isDuplicate){
+        { latitude: parseFloat(latitude), longitude: parseFloat(longitude) },
+        { latitude: existingLatitude, longitude: existingLongitude });
+      if(distance <= 100){
         return res.status(403).json({ error:"The incident is already reported. Help is on the way!" });
       }
     }
