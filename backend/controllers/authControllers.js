@@ -45,9 +45,10 @@ const login = async (req, res) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
     if (latitude && longitude) {
-      user.location.latitude = latitude;
-      user.location.longitude = longitude;
-      await user.save();
+      await User.updateOne(
+        { _id: user._id },
+        { $set: { 'location.latitude': latitude, 'location.longitude': longitude } }
+      );
     }
     const token = jwt.sign(
       { id: user._id, role: user.role, name: user.name },
@@ -65,8 +66,8 @@ const login = async (req, res) => {
     return res.status(200).json({ user: { _id, name, role } });
     
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: "Server error" });
+    console.error('Login error:', err);
+    res.status(500).json({ error: "Server error", detail: err.message });
   }
 };
 
