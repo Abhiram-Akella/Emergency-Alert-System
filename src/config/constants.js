@@ -1,5 +1,5 @@
 // API URL
-export const API_URL = 'http://localhost:3000'
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 // Mapbox token (replace with your own token in production)
 export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
