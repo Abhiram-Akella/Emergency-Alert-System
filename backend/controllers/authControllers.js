@@ -54,9 +54,12 @@ const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: 3600000, // 1 hour
+      sameSite: isProduction ? 'None' : 'Lax',
+      secure: isProduction,
     });
     const {_id, name, role} = user;
     return res.status(200).json({ user: { _id, name, role } });
@@ -92,7 +95,7 @@ const requestPasswordReset = async (req, res) => {
     // Generate reset token
     const resetToken = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '10m'});
     // Send email with reset token
-    const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
     const htmlContent = `
       <h3>Hi ${user.name},</h3>
       <p>You requested to reset your password. Click <a href="${resetLink}" style="color: #0284c7; text-decoration: underline;">here</a> to reset your password.</p>
@@ -133,7 +136,11 @@ const resetPassword = async(req,res)=>{
 }
 
 const logout = async (req, res) => {
-  res.clearCookie("token");
+  const isProduction = process.env.NODE_ENV === 'production';
+  res.clearCookie("token", {
+    sameSite: isProduction ? 'None' : 'Lax',
+    secure: isProduction,
+  });
   res.status(200).json({ message: "Logged out successfully" });
 }
 
