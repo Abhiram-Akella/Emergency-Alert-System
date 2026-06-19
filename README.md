@@ -2,6 +2,9 @@
 
 A real-time web application designed to bridge the gap between citizens in distress, the general public, and emergency response services. The system enables users to report emergencies with precise location data, auto-dispatches the nearest responders, alerts nearby citizens to offer immediate assistance or evacuation, and provides interactive map tracking along with an AI-driven guidance chatbot.
 
+# Live Link
+https://emergency-alert-system-epu6.onrender.com
+
 ## Core Features
 
 ### 1. Emergency Reporting and Media Uploads
