@@ -135,7 +135,7 @@ The frontend will run at `http://localhost:5173` and the backend at `http://loca
 ![Landing Page](./screenshots/landing_page.png)
 
 ### User Dashboard
-![User Dashboard](./screenshots/user_dashboard_page.png)
+![User Dashboard](./screenshots/user_dashboard.png)
 
 ### Admin Dashboard
 ![Admin Dashboard](./screenshots/admin_dashboard.png)
