@@ -2,7 +2,7 @@
 export const API_URL = 'http://localhost:3000'
 
 // Mapbox token (replace with your own token in production)
-export const MAPBOX_TOKEN = 'pk.eyJ1IjoiYWJoaXJhbTE3MDkiLCJhIjoiY203eGc4am1sMDVrcjJrc2EwNGRydnd0cyJ9.FSo5HbxG1-6_ekCL6M1LAg'
+export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 
 // Chart Colors
 export const CHART_COLORS = {

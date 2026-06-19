@@ -20,9 +20,6 @@ export const SocketProvider = ({ children }) => {
       try {
         socketInstance = io(API_URL, {
           withCredentials: true,
-          extraHeaders: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          },
           reconnectionAttempts: 3,
           reconnectionDelay: 1000,
           timeout: 5000

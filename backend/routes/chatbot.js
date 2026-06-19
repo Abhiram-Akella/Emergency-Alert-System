@@ -51,7 +51,7 @@ You are an AI assistant for our Emergency Alert System application. Here are the
 
 async function getChatbotResponse(userMessage) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const prompt = `${APP_CONTEXT}
 
 Based on the above context about our Emergency Alert System application, provide a helpful response to this user query: ${userMessage}
