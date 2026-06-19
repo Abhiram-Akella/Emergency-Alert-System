@@ -134,11 +134,11 @@ The frontend will run at `http://localhost:5173` and the backend at `http://loca
 ### Landing Page
 ![Landing Page](./screenshots/landing_page.png)
 
-### User Login
-![User Login](./screenshots/login_page.png)
+### User Dashboard
+![User Dashboard](./screenshots/user_dashboard_page.png)
 
-### User Registration
-![User Registration](./screenshots/register_page.png)
+### Admin Dashboard
+![Admin Dashboard](./screenshots/admin_dashboard.png)
 
-### Emergency Dashboard and Maps
-![Emergency Dashboard](./screenshots/dashboard.png)
+### Responder Map Navigation
+![Responder Map Navigation](./screenshots/map_navigation.png)
