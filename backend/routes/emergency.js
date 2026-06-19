@@ -1,6 +1,7 @@
 var express = require("express");
 var multer = require("multer");
 var authenticate = require("../middlewares/authMiddleware");
+const { distressLimiter } = require("../middlewares/rateLimiters");
 const {
   createReport,
   withdrawReport,
@@ -79,6 +80,6 @@ router.put("/:id/status", authenticate, updateReportStatus);
 router.post("/:reportId/notify-nearby", authenticate, notifyNearbyUsers);
 
 // Create a distress report
-router.post("/distress", upload.array("media", 1), createDistressReport);
+router.post("/distress", distressLimiter, upload.array("media", 1), createDistressReport);
 
 module.exports = router;

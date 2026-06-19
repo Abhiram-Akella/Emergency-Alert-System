@@ -1,5 +1,6 @@
 const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { chatbotLimiter } = require("../middlewares/rateLimiters");
 require("dotenv").config();
 
 const router = express.Router();
@@ -75,7 +76,7 @@ User Query: ${userMessage}`;
   }
 }
 
-router.post("/", async (req, res) => {
+router.post("/", chatbotLimiter, async (req, res) => {
   try {
     const { message } = req.body;
 
